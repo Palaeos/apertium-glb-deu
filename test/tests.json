@@ -1,0 +1,10 @@
+{
+    "glb-deu": {
+        "input": "glb-deu-input.txt",
+        "mode": "glb-deu"
+    },
+    "deu-glb": {
+        "input": "deu-glb-input.txt",
+        "mode": "deu-glb"
+    }
+}
