@@ -1,12 +1,12 @@
-glb and German: `apertium-glb-deu`
+Globasa and German: `apertium-glb-deu`
 ===============================================================================
 
-This is an Apertium language pair for translating between glb and
+This is an Apertium language pair for translating between Globasa and
 German. What you can use this language package for:
 
-* Translating between glb and German
-* Morphological analysis of glb and German
-* Part-of-speech tagging of glb and German
+* Translating between Globasa and German
+* Morphological analysis of Globasa and German
+* Part-of-speech tagging of Globasa and German
 
 For information on the latter two points, see subheading "For more
 information" below.
@@ -72,13 +72,13 @@ Files and data
 
 * [`apertium-glb-deu.glb-deu.dix`](apertium-glb-deu.glb-deu.dix) - Bilingual dictionary
 * [`apertium-glb-deu.glb-deu.rtx`](apertium-glb-deu.glb-deu.rtx) - Structural transfer rules for translating into German
-* [`apertium-glb-deu.deu-glb.rtx`](apertium-glb-deu.deu-glb.rtx) - Structural transfer rules for translating into glb
+* [`apertium-glb-deu.deu-glb.rtx`](apertium-glb-deu.deu-glb.rtx) - Structural transfer rules for translating into Globasa
 * [`apertium-glb-deu.glb-deu.lrx`](apertium-glb-deu.glb-deu.lrx) - Lexical selection rules for translating into German
-* [`apertium-glb-deu.deu-glb.lrx`](apertium-glb-deu.deu-glb.lrx) - Lexical selection rules for translating into glb
+* [`apertium-glb-deu.deu-glb.lrx`](apertium-glb-deu.deu-glb.lrx) - Lexical selection rules for translating into Globasa
 * [`apertium-glb-deu.glb-deu.lsx`](apertium-glb-deu.glb-deu.lsx) - Discontiguous multiword rules for translating into German
-* [`apertium-glb-deu.deu-glb.lsx`](apertium-glb-deu.deu-glb.lsx) - Discontiguous multiword rules for translating into glb
+* [`apertium-glb-deu.deu-glb.lsx`](apertium-glb-deu.deu-glb.lsx) - Discontiguous multiword rules for translating into Globasa
 * [`apertium-glb-deu.glb-deu.arx`](apertium-glb-deu.glb-deu.arx) - Anaphora resolution rules for translating into German
-* [`apertium-glb-deu.deu-glb.arx`](apertium-glb-deu.deu-glb.arx) - Anaphora resolution rules for translating into glb
+* [`apertium-glb-deu.deu-glb.arx`](apertium-glb-deu.deu-glb.arx) - Anaphora resolution rules for translating into Globasa
 * [`modes.xml`](modes.xml) - Translation modes
 
 For more information
