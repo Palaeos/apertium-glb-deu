@@ -2,27 +2,107 @@
 !! ATTRIBUTE CATEGORIES
 !!!!!!!!!!!!!!!
 
-number = (ND sg) sg pl sp ND;
-gender = (GD m) m f mf GD;
-det_type = def ind dem itg;
-tense = pres past fut ifi pri fti;
+number = sg pl sp ND;
+gender_DEU = m f mf nt GD;
+gender_GLB = m f ut nt GD;
+det_type = def ind dem itg pos qnt;
+definite = def ind;
+copula = vbser vblex;
+articles = der ein;
+degree = comp sup;
+person = p1 p2 p3;
+GLB_tense = pres past fut cni imp;
+finite = pis pii pri prs [GLB_tense];
+modal = können wollen sollen mussen could;
+aspect = prog impf pros;
+tense = [finite] [GLB_tense] inf pprs ger pp;
+out_tense = pprs ger pp;
+preflist = aw ex per;
+
+ing = pprs ger;
+ptc_type = pprs pp;
+
+!tense_PP = fut cni;
+tense_PP = pres past;
 
 !!!!!!!!!!!!!!!
 !! OUTPUT PATTERNS
 !!!!!!!!!!!!!!!
 
-n: _.gender.number;
-adj: _.gender.number;
-det_default: _.det_type;
-det_def: _.det_type.number;
+n: _;
+np: _;
+pfx: _;
+prn: _.person.gender_GLB.number;
+det_pos: _.<pos>.person.gender_GLB.number;
+det_pos_cor: _.<pos>;
+det_qnt_cor: _.<qnt>;
+det_def: _;
+
+
+
+posadj: _.<pos>.person.gender_GLB.number;
+adj: _;
+num: _;
+quant: _;
+pr: _;
+adv: _;
+vbmod: _;
+
+cnjsub: _;
+
+vblex: _.out_tense;
+vbinf: _.<inf>;
+prepv: _.tense;
+copula: _.tense; 
+verb: _.tense;
+v: _.tense;
+vv: _.tense;
+
+vbser: _;
+vbdo:  _;
+vbhaver: _;
+
+vbpr: _.GLB_tense.aspect;
+
+
+
+nou: _;
+
+! number is an output of the noun phrase so that the information can be used for determining the right number before in the Globasa.
 
 NP: _.number;
+npcomp: _.number;
+NNP: _;
+CNP: _;
+DP: _;
+NOM: _;
+CONJ: _;
+
+AP: _;
+AJ: _.degree;
+AJC: _;
+AVP: _;
+
+! tense is an output of the verbal phrases so that the information can be used for determining the tense marker in the Globasa.
+
+WERDEN: _.tense;
+BE: _.tense;
+HAVE: _.tense;
+VP: _.tense;
+PVP: _.tense;
+DVP: _;
+PRN: _.person.gender_GLB.number;
+S: _;
+
+REL: _;
 
 !!!!!!!!!!!!!!!
 !! TAG-REWRITE RULES
 !!!!!!!!!!!!!!!
 
-tense > tense : ifi past, pri pres, fti fut;
+tense > tense :  pii past, pri pres, pis cni, prs pres;
+
+gender_DEU > gender_GLB:  mf ut;
 
 !!!!!!!!!!!!!!!
 !! MACROS
@@ -33,6 +113,7 @@ det: (if (1.det_type = def or 1.det_type = ind)
       else
          1(det_default));
 
+
 !!!!!!!!!!!!!!!
 !! REDUCTION RULES
 !!!!!!!!!!!!!!!
@@ -41,6 +122,92 @@ det: (if (1.det_type = def or 1.det_type = ind)
 ! Input:  ^ראש<n><m><sg>/hovud<n><nt><sg>$ ^גדול<adj><m><sg>/stor<adj><nt><sg>$
 ! Output: ^stor<adj><nt><sg>$ ^hovud<n><nt><sg>$
 ! NP -> n.$number adj { 2[gender=1.gender, number=1.number] _ 1 } ;
+
+
+! Accounts for any number of adjectives, even with arbitrary degree adverbs
+NP -> n.$number { 1 } |
+      0.1: AJC n.$number { 1 _ 2 } ;
+
+! Extracts the number information from the noun to determine the right numeral to put before
+NNP ->      1:num NP.$number  { 1 _ %2[number=""] }
+            |
+            5:det_qnt_cor NP.$number  { 1 _ 2 }
+            |
+            0.1 : NP.$number  (if (1.number = sg) { un@num _ 1 }
+            elif (1.number = pl)  { plu@adj _ 1 }
+            else { 1 }
+            )|
+            ! inserts implied pronouns after adjectives. a numeral if available is used to pick the right number.
+            AJC  {  1 _ prpers@prn.p3.GD.sg }|
+            quant AJC  (if (1.number = sg)
+            { 1 _ 2 _ prpers@prn.p3.GD.sg }
+            else
+            { 1 _ 2 _ prpers@prn.p3.GD.pl }
+            )
+            ;
+
+! Translates the number information from the noun into the right numeral to put before.
+CNP ->      det_pos.$gender_DEU.$number NNP {1[gender_GLB = 1.gender_DEU>gender_GLB] _ 2 }|
+            NNP { 1 };
+
+! Accounts for determiners and removes definite/indefinite articles
+DP -> [articles]@det CNP { 2 }|
+      det_pos_cor CNP {1 _ 2 }|
+      det_def CNP {1 _ 2 }|
+      CNP { 1 };
+
+
+! Accounts for any number of adverbs
+AVP -> 0.1:adj.ord AVP { 1 _ 2 }  |
+       adj.ord { 1 } |
+       0.1:adv AVP { 1 _ 2 }  |
+       adv { 1 } ; 
+
+! Accounts for any number of adjectival phrases and carries forth the comparative degree to later convert to an adverb.
+AJ -> AVP adj.$degree { 1 _ 2 } |
+      adj.$degree { 1 } ;
+
+! Coverts the comparative degree into an adverb.
+AJC ->      AJ.comp { maxmo@adv _ 1  }|
+            AJ.sup { maxim@adv _ 1  }|
+            more@adv AJ { maxmo@adv _ 2 }|
+            less@adv AJ { minmo@adv _ 2 }|
+            AJ { 1  };
+
+! Accounts for any number of adjectival phrases including comparisons.
+AP -> AJC AP { 1 _ 2 } |
+      AJC { 1 } ;
+
+! Detects passive constructions and prefixes the verb accordingly.
+vv  -> vblex.$tense { %1 } |
+      %werden@vaux.$tense vblex.pp { be@pfx %2[tense = 1.tense] } |
+      %werden@vaux.$tense vblex.pp by@pr { be@pfx %2[tense=""] }|
+      %werden@vblex.$tense vblex.pp { be@pfx %2[tense=""] } |
+      %werden@vblex.$tense vblex.pp by@pr { be@pfx %2[tense=""] }|
+      %werden@vblex.$tense * vblex.pp { be@pfx %3[tense=""] _ 2 } |
+      %werden@vblex.$tense * vblex.pp by@pr { be@pfx %3[tense=""] _ 2 }
+;
+
+! Accounts for any adverb modifying the verb.
+
+VP -> vv.$tense { %1 } ;
+
+
+
+DVP -> 20:haben@vbhaver %VP.pp { u@vbpr.[1.tense>tense].perf _ %2[tense=""] }|
+       20:haben@vblex %VP.pp { u@vbpr.[1.tense>tense].perf _ %2[tense=""] }|
+       20:werden@vaux %VP.inf { u@vbpr.fut _ %2[tense=""] }|
+       20:werden@vblex %VP.inf { u@vbpr.fut _ %2[tense=""] }|
+       VP{ u@vbpr.[1.tense>tense] _ 1 }|
+       [modal]@vbmod VP.inf{ 1 _ u@vbpr.inf _ 2 }|
+       VP nicht@adv{ u@vbpr.[1.tense>tense].neg _ 1 };
+
+NOM -> DP {1}| prn {1}| np {1};
+
+REL -> cnjsub NOM NOM DVP {1 _ 2  _ 4 _ 3 } 
+| cnjsub NOM adj sein@vblex {1 _ 2  _ 4 _ 3 } 
+| prn.rel.*.nom NOM DVP {hu@cnjsub _ da@prn _ 3  _ 2 }
+| prn.rel.*.acc NOM DVP {hu@cnjsub _ 2 _ 3 _ da@prn } ;
 
 ! Resources:
 ! https://wiki.apertium.org/wiki/Apertium-recursive
